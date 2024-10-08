@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tab System with Upvotes</title>
+    <style>
+        /* Basic styles for the tabs and content */
+        body {
+            font-family: Arial, sans-serif;
+        }
+        .tab-container {
+            display: flex;
+            cursor: pointer;
+            background-color: #f1f1f1;
+            padding: 10px;
+        }
+        .tab {
+            padding: 10px 20px;
+            margin-right: 5px;
+            background-color: #ddd;
+            border-radius: 5px;
+        }
+        .tab.active {
+            background-color: #4CAF50;
+            color: white;
+        }
+        .content {
+            display: none;
+            padding: 20px;
+            border: 1px solid #ddd;
+            margin-top: 10px;
+            border-radius: 5px;
+        }
+        .content.active {
+            display: block;
+        }
+        .sentence {
+            margin: 10px 0;
+        }
+        .upvote {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .upvote:disabled {
+            background-color: grey;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+<body>
+<!-- Header Tab -->
+    <div>
+        <h1> Vote for your favourite questions</h1>
+		<p>Explanation of the highest quality.</p>
+    </div>
+
+    <!-- Tab Navigation -->
+    <div class="tab-container">
+        <div class="tab active" onclick="openTab(1)">Stefan</div>
+        <div class="tab" onclick="openTab(2)">Hassan</div>
+        <div class="tab" onclick="openTab(3)">Stéphanie</div>
+        <div class="tab" onclick="openTab(4)">Jeffrey</div>
+        <div class="tab" onclick="openTab(5)">Fanny</div>
+    </div>
+
+    <!-- Tab Content -->
+    <div id="tab-1" class="content active">
+        <div class="sentence">
+            Question 1.1 <button class="upvote" onclick="upvote(this)">Upvote</button> <span class="count">0</span>
+        </div>
+        <div class="sentence">
+            Question 1.2 <button class="upvote" onclick="upvote(this)">Upvote</button> <span class="count">0</span>
+        </div>
+        <div class="sentence">
+            Question 1.3 <button class="upvote" onclick="upvote(this)">Upvote</button> <span class="count">0</span>
+        </div>
+		        <div class="sentence">
+            Question 1.4 <button class="upvote" onclick="upvote(this)">Upvote</button> <span class="count">0</span>
+        </div>
+    </div>
+    <div id="tab-2" class="content">
+        <div class="sentence">
+            Question 2.1 <button class="upvote" onclick="upvote(this)">Upvote</button> <span class="count">0</span>
+        </div>
+        <div class="sentence">
+            Question 2.2 <button class="upvote" onclick="upvote(this)">Upvote</button> <span class="count">0</span>
+        </div>
+    </div>
+    <div id="tab-3" class="content">
+        <div class="sentence">
+            Question 3.1 <button class="upvote" onclick="upvote(this)">Upvote</button> <span class="count">0</span>
+        </div>
+        <div class="sentence">
+            Question 3.2 <button class="upvote" onclick="upvote(this)">Upvote</button> <span class="count">0</span>
+        </div>
+    </div>
+    <div id="tab-4" class="content">
+        <div class="sentence">
+            Question 4.1 <button class="upvote" onclick="upvote(this)">Upvote</button> <span class="count">0</span>
+        </div>
+        <div class="sentence">
+            Question 4.2 <button class="upvote" onclick="upvote(this)">Upvote</button> <span class="count">0</span>
+        </div>
+    </div>
+    <div id="tab-5" class="content">
+        <div class="sentence">
+            Question 5.1 <button class="upvote" onclick="upvote(this)">Upvote</button> <span class="count">0</span>
+        </div>
+        <div class="sentence">
+            Question 5.2 <button class="upvote" onclick="upvote(this)">Upvote</button> <span class="count">0</span>
+        </div>
+    </div>
+
+    <script>
+    // Handle tab switching
+    function openTab(tabIndex) {
+        // Hide all contents and remove active class from tabs
+        var tabs = document.querySelectorAll('.tab');
+        var contents = document.querySelectorAll('.content');
+        tabs.forEach(tab => tab.classList.remove('active'));
+        contents.forEach(content => content.classList.remove('active'));
+
+        // Show the current tab's content and activate the corresponding tab
+        document.getElementById('tab-' + tabIndex).classList.add('active');
+        tabs[tabIndex - 1].classList.add('active');
+    }
+
+    // Initialize upvotes for each tab in session storage
+    function initializeUpvotesForTab(tabIndex) {
+        let key = `upvotes_tab_${tabIndex}`;
+        if (!sessionStorage.getItem(key)) {
+            sessionStorage.setItem(key, '0');
+        }
+    }
+
+    // Initialize upvotes for all tabs
+    for (let i = 1; i <= 5; i++) {
+        initializeUpvotesForTab(i);
+    }
+
+    // Handle upvotes with per-tab limit
+    function upvote(button) {
+        // Get the active tab
+        let activeTab = document.querySelector('.tab.active');
+        let tabIndex = Array.from(activeTab.parentElement.children).indexOf(activeTab) + 1;
+        
+        let key = `upvotes_tab_${tabIndex}`;
+        let currentUpvotes = parseInt(sessionStorage.getItem(key));
+
+        // Check if upvote limit reached for the current tab
+        if (currentUpvotes >= 3) {
+            alert("You have reached the maximum of 3 upvotes for this tab.");
+            return;
+        }
+
+        // Update count display
+        let countSpan = button.nextElementSibling;
+        let currentCount = parseInt(countSpan.textContent);
+        countSpan.textContent = currentCount + 1;
+
+        // Disable the button to prevent multiple upvotes on the same sentence
+        button.disabled = true;
+
+        // Increment upvote count in session storage for this tab
+        sessionStorage.setItem(key, currentUpvotes + 1);
+    }
+</script>
+
+
+</body>
+</html>
